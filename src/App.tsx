@@ -1,13 +1,45 @@
 import React from "react";
-import { ReactComponent as Triforce } from "./assets/triforce.svg";
+import ItemsGrid from './components/ItemsGrid';
+import items from './data/items';
+import ItemsContext from './itemsContext';
+import {goUp, goDown, goLeft, goRight, indexToPosition} from './utils/keyboardNavigation';
+
 
 function App() {
+  const [selectedItem, setSelectedItem] = React.useState(0);
+
+  const contextState = {
+    selectedItem,
+    setSelectedItem
+  }
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    let newItemIndex = null;
+    const matrixPosition = indexToPosition(selectedItem)
+
+    if (e.key === "ArrowUp") {
+      newItemIndex = goUp(matrixPosition);
+    } else if (e.key === "ArrowDown") {
+      newItemIndex = goDown(matrixPosition);
+    } else if (e.key === "ArrowLeft") {
+      newItemIndex = goLeft(matrixPosition);
+    } else if (e.key === "ArrowRight") {
+      newItemIndex = goRight(matrixPosition);
+    }
+
+    if (newItemIndex != null) {
+      setSelectedItem(newItemIndex);
+    }
+  }
+
   return (
-    <div className="min-h-screen flex justify-center items-center">
-      <h1 className="flex items-center font-bold text-5xl tracking-tight text-gray-900">
-        Zelda BOTW Starter
-        <Triforce className="ml-4 w-20 h-20 text-zelda-yellow fill-current" />
-      </h1>
+    <div className="container mx-auto flex flex-col xl:flex-row bg-zelda-darkGreen" onKeyDown={handleKeyPress} tabIndex={0}>
+      <div className="w-full xl:w-1/2">
+        <ItemsContext.Provider value={contextState}>
+          <ItemsGrid items={items.weapons}/>
+        </ItemsContext.Provider>
+      </div>
+      <div className="w-full xl:w-1/2"/>
     </div>
   );
 }
